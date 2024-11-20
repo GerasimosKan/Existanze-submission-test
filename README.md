@@ -18,14 +18,14 @@ Follow these steps to set up and run the application:
    - Download and install Python 3.9.
    - Verify the installation:
      ```bash
-     python3 --version
+     python --version
      ```
 
 2. **Create a Virtual Environment:**
 
    - Run the following command to create a virtual environment:
      ```bash
-     python3 -m venv virtualenv-[yourname]
+     python -m venv virtualenv-[yourname]
      ```
 
 3. **Activate the Virtual Environment:**
