@@ -99,6 +99,8 @@ def search_character(character_name, world_option=False):
                 cached_data["timestamp"],
             )
             search_result = "Success"
+        elif world_option and not cached_data.get("homeworld_data"):
+            search_result = fetchDataFromApi(character_name, world_option, cache)
         elif not world_option:
             print(f"Using cached data for '{character_name}'...")
             display_character_info(
@@ -108,29 +110,7 @@ def search_character(character_name, world_option=False):
         else:
             search_result = "Failure"
     else:
-        # Fetch data from the API
-        data = get_character_data(character_name)
-        if data and "results" in data and data["results"]:
-            character = data["results"]
-
-            homeworld_data = None
-            if world_option and "homeworld" in character[0]:
-                homeworld_url = character[0]["homeworld"]
-                homeworld_data = get_homeworld_data(homeworld_url)
-
-            display_character_info(character, homeworld_data)
-
-            # Cache the results
-            timestamp = datetime.now().isoformat()
-            cache[character_name] = {
-                "character_data": character,
-                "homeworld_data": homeworld_data,
-                "timestamp": timestamp,
-            }
-            save_cache(cache)
-            search_result = "Success"
-        else:
-            print(f"No character found for '{character_name}'.")
+        search_result = fetchDataFromApi(character_name, world_option, cache)
 
     # Log search to the history
     cache["search_history"].append(
@@ -141,6 +121,35 @@ def search_character(character_name, world_option=False):
         }
     )
     save_cache(cache)
+
+
+# Fetch data from the API
+def fetchDataFromApi(character_name, world_option, cache):
+    data = get_character_data(character_name)
+    if data and "results" in data:
+        character = data["results"]
+
+        homeworld_data = None
+        if world_option and "homeworld" in character[0]:
+            homeworld_url = character[0]["homeworld"]
+            homeworld_data = get_homeworld_data(homeworld_url)
+
+        display_character_info(character, homeworld_data)
+
+        # Cache the results
+        timestamp = datetime.now().isoformat()
+        cache[character_name] = {
+            "character_data": character,
+            "homeworld_data": homeworld_data,
+            "timestamp": timestamp,
+        }
+        save_cache(cache)
+        return "Success"
+    else:
+        print(
+            f"No data found or results in the API response for the '{character_name}'."
+        )
+        return "Failure"
 
 
 # Clean the cache
@@ -179,7 +188,7 @@ def main():
             args.remove("--world")
 
         if command.lower() == "search" and args:
-            character_name = " ".join(args)
+            character_name = " ".join(args).strip("'")
             search_character(character_name, world_option)
 
         elif command.lower() == "cache" and args:
