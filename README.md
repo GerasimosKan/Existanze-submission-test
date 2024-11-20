@@ -18,7 +18,7 @@ To run 'The Star Wars API' the following steps have to be performed:
 
 ### Test levels
 
-To test all the levels of the submission ..... bla bla bla
+To test all the levels of the submission
 
 ### Troubleshooting
 
